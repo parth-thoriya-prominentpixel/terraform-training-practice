@@ -35,21 +35,20 @@ jobs:
           aws-region: us-east-1
 
       - name: AWS Role Assumed
-        run: |
-          echo "✅ AWS role assumed."
+        run: echo "✅ AWS role assumed."
 
       - name: Terraform Cloud Login
         run: |
           mkdir -p ~/.terraform.d
           cat > ~/.terraform.d/credentials.tfrc.json <<EOF
-{
-  "credentials": {
-    "app.terraform.io": {
-      "token": "${{ secrets.HCP_TOKEN }}"
-    }
-  }
-}
-EOF
+          {
+            "credentials": {
+              "app.terraform.io": {
+                "token": "${{ secrets.HCP_TOKEN }}"
+              }
+            }
+          }
+          EOF
           echo "✅ Terraform Cloud login file created."
 
       - name: Copy tfvars as auto.tfvars
