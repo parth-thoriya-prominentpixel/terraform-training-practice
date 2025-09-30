@@ -1,0 +1,60 @@
+locals {
+  prefix_region_map = {
+    "af-south-1"     = "afs1"
+    "ap-east-1"      = "ape1"
+    "ap-northeast-1" = "apne1"
+    "ap-northeast-2" = "apne2"
+    "ap-northeast-3" = "apne3"
+    "ap-south-1"     = "aps1"
+    "ap-south-2"     = "aps2"
+    "ap-southeast-1" = "apse1"
+    "ap-southeast-2" = "apse2"
+    "ap-southeast-3" = "apse3"
+    "ap-southeast-4" = "apse4"
+    "ap-southeast-5" = "apse5"
+    "ap-southeast-7" = "apse7"
+    "ca-central-1"   = "cac1"
+    "ca-west-1"      = "caw1"
+    "cn-north-1"     = "cnn1"
+    "cn-northwest-1" = "cnnw1"
+    "eu-central-1"   = "euc1"
+    "eu-central-2"   = "euc2"
+    "eu-north-1"     = "eun1"
+    "eu-south-1"     = "eus1"
+    "eu-south-2"     = "eus2"
+    "eu-west-1"      = "euw1"
+    "eu-west-2"      = "euw2"
+    "eu-west-3"      = "euw3"
+    "il-central-1"   = "ilc1"
+    "me-central-1"   = "mec1"
+    "me-south-1"     = "mes1"
+    "mx-central-1"   = "mxc1"
+    "sa-east-1"      = "sae1"
+    "us-east-1"      = "use1"
+    "us-east-2"      = "use2"
+    "us-gov-east-1"  = "usge1"
+    "us-gov-west-1"  = "usgw1"
+    "us-west-1"      = "usw1"
+    "us-west-2"      = "usw2"
+  }
+
+  is_primary            = var.region == "us-east-1"
+  prefix_region         = local.prefix_region_map["${var.region}"]
+base_sourse_link = "git@github.com:parth-thoriya-prominentpixel/terraform-aws-monorepo.git"
+
+tags = {
+    # application = var.application
+    company     = var.company
+    env         = var.env
+    repository  = var.repo_url
+    created_by  = "Terraform"
+    project     = var.project
+    region      = var.region
+  }
+
+s3_domain = module.s3_bucket.s3_bucket_bucket_domain_name
+
+bucket_name = "${var.prefix_company}-s3-tf-task-${local.prefix_region}-${var.env}"
+
+  python = "C:\\Users\\DELL\\AppData\\Local\\Programs\\Python\\Python313\\"
+}
