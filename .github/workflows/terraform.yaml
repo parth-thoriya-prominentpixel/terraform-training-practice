@@ -57,14 +57,15 @@ jobs:
           EOF
           echo "✅ Terraform Cloud login file created."
 
-      - name: Verify Inputs File Exists
+      - name: Copy tfvars as auto.tfvars
         run: |
           INPUT_FILE="environments/digiclarity/us-east-1/dev/inputs.tfvars"
           if [ ! -f "$INPUT_FILE" ]; then
             echo "❌ Missing $INPUT_FILE"
             exit 1
           fi
-          echo "✅ Found tfvars: $INPUT_FILE"
+          cp "$INPUT_FILE" resources/inputs.auto.tfvars
+          echo "✅ Copied $INPUT_FILE → resources/inputs.auto.tfvars"
 
       - name: Terraform Init
         working-directory: resources
@@ -76,87 +77,19 @@ jobs:
         if: github.event.inputs.action == 'plan'
         working-directory: resources
         run: |
-          terraform plan -input=false -var-file=../environments/digiclarity/us-east-1/dev/inputs.tfvars
+          terraform plan -input=false
           echo "✅ Terraform plan completed."
 
       - name: Terraform Apply
         if: github.event.inputs.action == 'apply'
         working-directory: resources
         run: |
-          terraform apply -auto-approve -input=false -var-file=../environments/digiclarity/us-east-1/dev/inputs.tfvars
+          terraform apply -auto-approve -input=false
           echo "✅ Terraform apply completed."
 
       - name: Terraform Destroy
         if: github.event.inputs.action == 'destroy'
         working-directory: resources
         run: |
-          terraform destroy -auto-approve -input=false -var-file=../environments/digiclarity/us-east-1/dev/inputs.tfvars
+          terraform destroy -auto-approve -input=false
           echo "✅ Terraform destroy completed."
-name: Terraform Pipeline
-
-on:
-  workflow_dispatch:  # manual trigger
-
-permissions:
-  id-token: write    # required for OIDC role assumption
-  contents: read
-
-jobs:
-  terraform:
-    runs-on: ubuntu-latest
-
-    steps:
-      # Checkout repo
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      # Configure SSH for private modules
-      - name: Setup SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan github.com >> ~/.ssh/known_hosts
-
-      # Assume AWS role for Terraform resources
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.ROLE_ASSUME_ROLE }}
-          aws-region: us-east-1
-
-      # Export Terraform Cloud token (for CLI login)
-      - name: Terraform Cloud Login
-        run: |
-          mkdir -p ~/.terraform.d
-          cat > ~/.terraform.d/credentials.tfrc.json <<EOF
-          {
-            "credentials": {
-              "app.terraform.io": {
-                "token": "${{ secrets.HCP_TOKEN }}"
-              }
-            }
-          }
-          EOF
-      - name: Copy tfvars as auto.tfvars
-        run: |
-          cp environments/digiclarity/us-east-1/dev/inputs.tfvars resources/inputs.auto.tfvars
-          echo "✅ Copied inputs.tfvars to resources/inputs.auto.tfvars"
-
-      # Terraform Init
-      - name: Terraform Init
-        run: terraform init
-
-      # Terraform Plan
-      - name: Terraform Plan
-        run: terraform plan -input=false
-
-      # Terraform Apply (auto-approve in CI/CD)
-      - name: Terraform Apply
-        if: github.event.inputs.action == 'apply'
-        run: terraform apply -auto-approve -input=false
-
-      # Terraform Destroy (manual trigger)
-      - name: Terraform Destroy
-        if: github.event.inputs.action == 'destroy'
-        run: terraform destroy -auto-approve -input=false
