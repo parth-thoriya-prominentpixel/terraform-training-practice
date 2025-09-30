@@ -30,7 +30,7 @@ terraform {
 # Default
 provider "aws" {
   region     = "us-east-1"
-assume_role {
-    role_arn = var.aws_assume_role_arn != "" ? var.aws_assume_role_arn : null
+  assume_role {
+    role_arn = getenv("TFC_AWS_RUN_ROLE_ARN")
   }
 }
