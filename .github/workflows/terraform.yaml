@@ -2,11 +2,6 @@ name: Terraform Pipeline
 
 on:
   workflow_dispatch:
-    inputs:
-      action:
-        description: "Terraform action: plan / apply / destroy"
-        required: true
-        default: "plan"
 
 permissions:
   id-token: write
@@ -71,26 +66,26 @@ jobs:
       - name: Terraform Init
         working-directory: resources
         run: |
-          terraform init -input=false
+          terraform init 
           echo "✅ Terraform init completed."
 
       - name: Terraform Plan
         if: github.event.inputs.action == 'plan'
         working-directory: resources
         run: |
-          terraform plan -input=false
+          terraform plan 
           echo "✅ Terraform plan completed."
 
       - name: Terraform Apply
         if: github.event.inputs.action == 'apply'
         working-directory: resources
         run: |
-          terraform apply -auto-approve -input=false
+          terraform apply -auto-approve 
           echo "✅ Terraform apply completed."
 
       - name: Terraform Destroy
         if: github.event.inputs.action == 'destroy'
         working-directory: resources
         run: |
-          terraform destroy -auto-approve -input=false
+          terraform destroy -auto-approve 
           echo "✅ Terraform destroy completed."
