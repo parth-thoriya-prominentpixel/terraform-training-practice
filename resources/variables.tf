@@ -59,23 +59,8 @@ variable "source_email_address" {
   type        = string
   default     = null
 }
-variable "encrypt" {
-  type = bool
-  default = false
-  description = "encrypt"
-}
-variable "bucket" {
-  type = string
-  
-  description = "bucket for s3 backend"
-}
-variable "dynamodb_table" {
- type = string
-  
-}
-variable "key" {
-  type = string
-}
+
+
 ########################################
 ######## S3 
 ########################################
