@@ -7,9 +7,6 @@ company              = "DigiClarity"
 source_email_address = "no-reply@digitcla-dev.com"
 role_name            = "digicla-iam-shared-deployment-role-dev"
 
-email_subscription = "thoriyaparth1011@gmail.com"
-trigger_lambda_name = "s3-trigger"
+
 s3_bucket_name = "tf-task"
-iam_role_name = "demo-relo"
-iam_policy_name = "demo-policy-using-tf"
-api_gateway = "dev-http"
+
