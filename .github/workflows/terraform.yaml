@@ -36,6 +36,13 @@ jobs:
 
       - name: AWS Role Assumed
         run: echo "✅ AWS role assumed."
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: latest
+
+      - name: Terraform Installed
+        run: terraform -version
 
       - name: Terraform Cloud Login
         run: |
