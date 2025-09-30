@@ -69,4 +69,14 @@ variable "s3_bucket_name" {
   type = string   
   default = null
   
+} 
+
+########################################
+#### HCP 
+########################################
+variable "aws_assume_role_arn" {
+  description = "AWS role to assume for Terraform Cloud"
+  type        = string
+  default     = ""
 }
+
