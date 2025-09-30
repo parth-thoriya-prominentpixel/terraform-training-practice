@@ -1,10 +1,11 @@
-terraform {
+#terraform {
 #  cloud {
 #    organization = "parth-thoriya-prominentpixel"
 #    workspaces {
 #      name = "terraform-training-practice"
 #    }
 #  }
+#}
 terraform {
   backend "remote" {
     organization = "parth-thoriya-prominentpixel"
@@ -13,7 +14,7 @@ terraform {
       name = "terraform-training-practice"
     }
   }
-}
+
 
   required_providers {
     aws = {
@@ -21,8 +22,8 @@ terraform {
       version = ">= 4.0"
     }
   }
-
 }
+
 
 
 
