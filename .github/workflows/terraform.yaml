@@ -20,11 +20,12 @@ jobs:
       - name: Set up SSH key for GitHub
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' | base64 --decode > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           eval "$(ssh-agent -s)"
           ssh-add ~/.ssh/id_rsa
           ssh-keyscan -H github.com >> ~/.ssh/known_hosts
+          echo "✅ SSH key added successfully."
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
