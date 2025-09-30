@@ -56,5 +56,4 @@ s3_domain = module.s3_bucket.s3_bucket_bucket_domain_name
 
 bucket_name = "${var.prefix_company}-s3-tf-task-${local.prefix_region}-${var.env}"
 
-  python = "C:\\Users\\DELL\\AppData\\Local\\Programs\\Python\\Python313\\"
 }
