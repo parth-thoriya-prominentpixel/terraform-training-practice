@@ -20,14 +20,6 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
 
-      - name: Verify Required Secrets
-        run: |
-          echo "🔎 Checking required secrets..."
-          test -n "${{ secrets.SSH_PRIVATE_KEY }}" || (echo "❌ Missing SSH_PRIVATE_KEY" && exit 1)
-          test -n "${{ secrets.ROLE_ASSUME_ROLE }}" || (echo "❌ Missing ROLE_ASSUME_ROLE" && exit 1)
-          test -n "${{ secrets.HCP_TOKEN }}" || (echo "❌ Missing HCP_TOKEN" && exit 1)
-          echo "✅ Secrets check passed."
-
       - name: Setup SSH for Private Modules
         run: |
           mkdir -p ~/.ssh
@@ -41,20 +33,23 @@ jobs:
         with:
           role-to-assume: ${{ secrets.ROLE_ASSUME_ROLE }}
           aws-region: us-east-1
-      - run: echo "✅ AWS role assumed."
+
+      - name: AWS Role Assumed
+        run: |
+          echo "✅ AWS role assumed."
 
       - name: Terraform Cloud Login
         run: |
           mkdir -p ~/.terraform.d
           cat > ~/.terraform.d/credentials.tfrc.json <<EOF
-          {
-            "credentials": {
-              "app.terraform.io": {
-                "token": "${{ secrets.HCP_TOKEN }}"
-              }
-            }
-          }
-          EOF
+{
+  "credentials": {
+    "app.terraform.io": {
+      "token": "${{ secrets.HCP_TOKEN }}"
+    }
+  }
+}
+EOF
           echo "✅ Terraform Cloud login file created."
 
       - name: Copy tfvars as auto.tfvars
