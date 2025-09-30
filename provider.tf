@@ -1,10 +1,20 @@
 terraform {
-  cloud {
+#  cloud {
+#    organization = "parth-thoriya-prominentpixel"
+#    workspaces {
+#      name = "terraform-training-practice"
+#    }
+#  }
+terraform {
+  backend "remote" {
     organization = "parth-thoriya-prominentpixel"
+
     workspaces {
       name = "terraform-training-practice"
     }
   }
+}
+
   required_providers {
     aws = {
       source  = "hashicorp/aws"
