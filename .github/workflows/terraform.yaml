@@ -2,6 +2,12 @@ name: Terraform Pipeline
 
 on:
   workflow_dispatch:
+    inputs:
+      action:
+        description: "Terraform action: plan / apply / destroy"
+        required: true
+        default: "plan"
+  # workflow_dispatch:
 
 permissions:
   id-token: write
