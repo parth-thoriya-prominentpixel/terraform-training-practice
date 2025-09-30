@@ -59,7 +59,7 @@ jobs:
 
       - name: Copy tfvars as auto.tfvars
         run: |
-          INPUT_FILE="environments/digiclarity/us-east-1/dev/inputs.tfvars"
+          INPUT_FILE="../environments/digiclarity/us-east-1/dev/inputs.tfvars"
           if [ ! -f "$INPUT_FILE" ]; then
             echo "❌ Missing $INPUT_FILE"
             exit 1
