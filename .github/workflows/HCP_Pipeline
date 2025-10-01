@@ -1,0 +1,133 @@
+name: Terraform Pipeline
+
+on:
+  workflow_dispatch:
+
+    inputs:
+      environment:
+        description: 'Environment to deploy'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - uat
+          - prod
+      workspace:
+        description: 'Terraform Cloud workspace name'
+        required: true
+        default: 'demo-multi-region-deploy'
+        type: choice
+        options:
+          - demo-multi-region-deploy
+          - dev
+          - qa
+          - uat
+          - prod
+      working_directory:
+        description: 'Terraform working directory'
+        required: true
+        default: 'resources'
+        type: choice
+        options:
+          - resources
+      run_apply:
+        description: 'Run terraform apply'
+        required: true
+        default: 'false'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+      run_destroy:
+        description: 'Run terraform destroy'
+        required: true
+        default: 'false'
+        type: choice
+        options:
+          - 'true'
+          - 'false'    
+permissions:
+  id-token: write
+  contents: read 
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./resources
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Set up SSH key for GitHub
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          eval "$(ssh-agent -s)"
+          ssh-add ~/.ssh/id_rsa
+          ssh-keyscan -H github.com >> ~/.ssh/known_hosts
+          echo "SSH key added successfully."
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.ROLE_ASSUME_ROLE }}
+          aws-region: us-east-1
+
+      - name: AWS Role Assumed
+        run: echo "AWS role assumed."
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: latest
+
+      - name: Terraform Installed
+        run: terraform -version
+
+      - name: Terraform Cloud Login
+        run: |
+          mkdir -p ~/.terraform.d
+          cat > ~/.terraform.d/credentials.tfrc.json <<EOF
+          {
+            "credentials": {
+              "app.terraform.io": {
+                "token": "${{ secrets.HCP_TOKEN }}"
+              }
+            }
+          }
+          EOF
+          echo "Terraform Cloud login file created."
+
+      - name: Copy tfvars as auto.tfvars
+        run: |
+          INPUT_FILE="../environments/digiclarity/us-east-1/dev/inputs.tfvars"
+          if [ ! -f "$INPUT_FILE" ]; then
+            echo "Missing $INPUT_FILE"
+            exit 1
+          fi
+          cp "$INPUT_FILE" ./inputs.auto.tfvars
+          echo "Copied $INPUT_FILE → resources/inputs.auto.tfvars"
+
+      - name: Terraform Init
+        working-directory: resources
+        run: |
+          terraform init 
+          echo "Terraform init completed."
+
+      - name: Terraform Plan
+        run: |
+          terraform plan 
+          echo "Terraform plan completed."
+
+      - name: Terraform Apply
+        run: |
+          terraform apply -auto-approve 
+          echo "Terraform apply completed."
+
+      - name: Terraform Destroy
+        run: |
+          terraform destroy -auto-approve 
+          echo "✅ Terraform destroy completed."
